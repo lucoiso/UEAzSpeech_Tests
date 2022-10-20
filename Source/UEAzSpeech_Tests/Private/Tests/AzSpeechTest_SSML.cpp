@@ -30,12 +30,16 @@ bool FSSMLToStreamTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 
 	// Check if cached SSML data is equal to the given SSML
 	{
-		const FString Expected = FString(RawSSML);
-		TestResult = TestResult && TestEqual(TEXT("The generated FString needs to contain the given converted SSML content"), TestTask->SSMLString, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The generated FString needs to contain the given converted SSML content"), TestTask->SSMLString, RawSSML);
 	}
 
 	// Check if the output buffer has data
@@ -59,12 +63,16 @@ bool FSSMLToVoiceTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 
 	// Check if cached SSML data is equal to the given SSML
 	{
-		const FString Expected = FString(RawSSML);
-		TestResult = TestResult && TestEqual(TEXT("The generated FString needs to contain the given converted SSML content"), TestTask->SSMLString, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The generated FString needs to contain the given converted SSML content"), TestTask->SSMLString, RawSSML);
 	}
 
 	// Check if the output buffer has data
@@ -97,8 +105,7 @@ bool FSSMLToWavTest::RunTest(const FString& Parameters)
 
 	// Check if cached SSML data is equal to the given SSML
 	{
-		const FString Expected = FString(RawSSML);
-		TestResult = TestResult && TestEqual(TEXT("The generated FString needs to contain the given converted SSML content"), TestTask->SSMLString, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The generated FString needs to contain the given converted SSML content"), TestTask->SSMLString, RawSSML);
 	}
 	
 	if (const bool bDirectoryCreated = UAzSpeechHelper::CreateNewDirectory(TestTask->FilePath))

@@ -26,6 +26,11 @@ bool FVoiceToTextDefaultTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 
 	// To do
@@ -43,6 +48,11 @@ bool FVoiceToTextAutoTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 	
 	// To do

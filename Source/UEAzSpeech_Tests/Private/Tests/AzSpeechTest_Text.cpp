@@ -36,12 +36,16 @@ bool FTextToStreamDefaultTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 
 	// Check if cached SSML data is equal to the given Text
 	{
-		const FString Expected = FString(TextToConvert);
-		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, TextToConvert);
 	}
 
 	// Check if cached LanguageId is equal to what we passed
@@ -78,12 +82,16 @@ bool FTextToStreamAutoTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 
 	// Check if cached SSML data is equal to the given Text
 	{
-		const FString Expected = FString(TextToConvert);
-		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, TextToConvert);
 	}
 
 	// Check if cached LanguageId is equal to what we passed
@@ -114,12 +122,16 @@ bool FTextToVoiceDefaultTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 
 	// Check if cached SSML data is equal to the given Text
 	{
-		const FString Expected = FString(TextToConvert);
-		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, TextToConvert);
 	}
 
 	// Check if cached LanguageId is equal to what we passed
@@ -156,12 +168,16 @@ bool FTextToVoiceAutoTest::RunTest(const FString& Parameters)
 	// Check if the task is valid
 	{
 		TestResult = TestResult && TestNotNull(TEXT("The created task that we'll use in all below test cases need to be valid"), TestTask);
+
+		if (!TestResult)
+		{
+			return false;
+		}
 	}
 
 	// Check if cached SSML data is equal to the given Text
 	{
-		const FString Expected = FString(TextToConvert);
-		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, TextToConvert);
 	}
 
 	// Check if cached LanguageId is equal to what we passed
@@ -201,8 +217,7 @@ bool FTextToWavDefaultTest::RunTest(const FString& Parameters)
 
 	// Check if cached SSML data is equal to the given Text
 	{
-		const FString Expected = FString(TextToConvert);
-		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, TextToConvert);
 	}
 
 	// Check if cached LanguageId is equal to what we passed
@@ -279,8 +294,7 @@ bool FTextToWavAutoTest::RunTest(const FString& Parameters)
 
 	// Check if cached SSML data is equal to the given Text
 	{
-		const FString Expected = FString(TextToConvert);
-		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, Expected);
+		TestResult = TestResult && TestEqual(TEXT("The cached text needs to be equal to what we passed on construction"), TestTask->TextToConvert, TextToConvert);
 	}
 
 	// Check if cached LanguageId is equal to what we passed
