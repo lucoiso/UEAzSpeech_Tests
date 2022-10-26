@@ -25,7 +25,7 @@ static const FString DefaultVoice = "en-US-AriaNeural";
 // static const FString DefaultLanguage = "en-US";
 // static const FString DefaultVoice = "en-US-AriaNeural";
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToStreamDefaultTest, "AzSpeechTests.Synthesizer.Default.TextToStream", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToStreamDefaultTest, "AzSpeech.Synthesizer.Default.TextToStream", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
 bool FTextToStreamDefaultTest::RunTest(const FString& Parameters)
 {
 	GLog->Log("Running AzSpeech Test: " + GetTestName());
@@ -71,13 +71,13 @@ bool FTextToStreamDefaultTest::RunTest(const FString& Parameters)
 	return TestResult;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToStreamAutoTest, "AzSpeechTests.Synthesizer.Auto.TextToStream", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToStreamAutoTest, "AzSpeech.Synthesizer.Auto.TextToStream", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
 bool FTextToStreamAutoTest::RunTest(const FString& Parameters)
 {
 	GLog->Log("Running AzSpeech Test: " + GetTestName());
 
 	bool TestResult = true;
-	UTextToStreamAsync* const TestTask = UTextToStreamAsync::TextToStream(nullptr, TextToConvert, "Auto", FString());
+	UTextToStreamAsync* const TestTask = UTextToStreamAsync::TextToStream(nullptr, TextToConvert, "Auto", "Auto");
 
 	// Check if the task is valid
 	{
@@ -111,7 +111,7 @@ bool FTextToStreamAutoTest::RunTest(const FString& Parameters)
 	return TestResult;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToVoiceDefaultTest, "AzSpeechTests.Synthesizer.Default.TextToVoice", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToVoiceDefaultTest, "AzSpeech.Synthesizer.Default.TextToVoice", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
 bool FTextToVoiceDefaultTest::RunTest(const FString& Parameters)
 {
 	GLog->Log("Running AzSpeech Test: " + GetTestName());
@@ -151,19 +151,19 @@ bool FTextToVoiceDefaultTest::RunTest(const FString& Parameters)
 		const std::string Voice_STD = TCHAR_TO_UTF8(*TestTask->VoiceName);
 
 		const bool OutputResult = TestTask->DoAzureTaskWork_Internal(TextToConvert_STD, Language_STD, Voice_STD);
-		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), !OutputResult);
+		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), OutputResult);
 	}
 
 	return TestResult;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToVoiceAutoTest, "AzSpeechTests.Synthesizer.Auto.TextToVoice", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToVoiceAutoTest, "AzSpeech.Synthesizer.Auto.TextToVoice", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
 bool FTextToVoiceAutoTest::RunTest(const FString& Parameters)
 {
 	GLog->Log("Running AzSpeech Test: " + GetTestName());
 
 	bool TestResult = true;
-	UTextToVoiceAsync* const TestTask = UTextToVoiceAsync::TextToVoice(nullptr, TextToConvert, "Auto", FString());
+	UTextToVoiceAsync* const TestTask = UTextToVoiceAsync::TextToVoice(nullptr, TextToConvert, "Auto", "Auto");
 
 	// Check if the task is valid
 	{
@@ -191,13 +191,13 @@ bool FTextToVoiceAutoTest::RunTest(const FString& Parameters)
 		const std::string Language_STD = TCHAR_TO_UTF8(*TestTask->LanguageID);
 
 		const bool OutputResult = TestTask->DoAzureTaskWork_Internal(TextToConvert_STD, Language_STD, std::string());
-		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), !OutputResult);
+		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), OutputResult);
 	}
 
 	return TestResult;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToWavDefaultTest, "AzSpeechTests.Synthesizer.Default.TextToWav", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToWavDefaultTest, "AzSpeech.Synthesizer.Default.TextToWav", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
 bool FTextToWavDefaultTest::RunTest(const FString& Parameters)
 {
 	GLog->Log("Running AzSpeech Test: " + GetTestName());
@@ -242,6 +242,13 @@ bool FTextToWavDefaultTest::RunTest(const FString& Parameters)
 
 	// Generated .wav file path
 	const FString FilePath_UE = UAzSpeechHelper::QualifyWAVFileName(TestTask->FilePath, TestTask->FileName);
+	
+	// Check if the .wav file already exists due to previous tests and delete it
+	if (FPaths::FileExists(FilePath_UE))
+	{
+		// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+		IFileManager::Get().Delete(*FilePath_UE, true, true, true);
+	}
 
 	// Check if the output buffer has data
 	{
@@ -252,7 +259,7 @@ bool FTextToWavDefaultTest::RunTest(const FString& Parameters)
 		
 		const bool OutputResult = TestTask->DoAzureTaskWork_Internal(TextToConvert_STD, Language_STD, Voice_STD, FilePath_STD);
 
-		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), !OutputResult);
+		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), OutputResult);
 	}
 
 	// Check the generated file
@@ -269,9 +276,10 @@ bool FTextToWavDefaultTest::RunTest(const FString& Parameters)
 				TestResult = TestResult && TestTrue(TEXT("After the task work, the output file size can't be 0"), FileSize > 0);
 			}
 
-			// Delete the generated file
+			// Try to delete the generated file
 			{
-				TestResult = TestResult && TestTrue(TEXT("After the task work, we need to delete the generated file"), IFileManager::Get().Delete(*FilePath_UE));
+				// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+				IFileManager::Get().Delete(*FilePath_UE, true, true, true);
 			}
 		}
 	}
@@ -279,13 +287,13 @@ bool FTextToWavDefaultTest::RunTest(const FString& Parameters)
 	return TestResult;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToWavAutoTest, "AzSpeechTests.Synthesizer.Auto.TextToWav", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTextToWavAutoTest, "AzSpeech.Synthesizer.Auto.TextToWav", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
 bool FTextToWavAutoTest::RunTest(const FString& Parameters)
 {
 	GLog->Log("Running AzSpeech Test: " + GetTestName());
 
 	bool TestResult = true;
-	UTextToWavAsync* const TestTask = UTextToWavAsync::TextToWav(nullptr, TextToConvert, FPaths::AutomationDir(), TEXT("AzSpeech_TestAudioFile"), "Auto", FString());
+	UTextToWavAsync* const TestTask = UTextToWavAsync::TextToWav(nullptr, TextToConvert, FPaths::AutomationDir(), TEXT("AzSpeech_TestAudioFile"), "Auto", "Auto");
 
 	// Check if the task is valid
 	{
@@ -315,6 +323,13 @@ bool FTextToWavAutoTest::RunTest(const FString& Parameters)
 	// Generated .wav file path
 	const FString FilePath_UE = UAzSpeechHelper::QualifyWAVFileName(TestTask->FilePath, TestTask->FileName);
 	
+	// Check if the .wav file already exists due to previous tests and delete it
+	if (FPaths::FileExists(FilePath_UE))
+	{
+		// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+		IFileManager::Get().Delete(*FilePath_UE, true, true, true);
+	}
+
 	// Check if the output buffer has data
 	{
 		const std::string TextToConvert_STD = TCHAR_TO_UTF8(*TestTask->TextToConvert);
@@ -340,9 +355,10 @@ bool FTextToWavAutoTest::RunTest(const FString& Parameters)
 				TestResult = TestResult && TestTrue(TEXT("After the task work, the output file size can't be 0"), FileSize > 0);
 			}
 
-			// Delete the generated file
+			// Try to delete the generated file
 			{
-				TestResult = TestResult && TestTrue(TEXT("After the task work, we need to delete the generated file"), IFileManager::Get().Delete(*FilePath_UE));
+				// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+				IFileManager::Get().Delete(*FilePath_UE, true, true, true);
 			}
 		}
 	}

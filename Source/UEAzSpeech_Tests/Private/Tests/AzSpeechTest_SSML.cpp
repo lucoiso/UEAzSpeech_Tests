@@ -79,7 +79,7 @@ bool FSSMLToVoiceTest::RunTest(const FString& Parameters)
 	{
 		const std::string SSMLString_STD = TCHAR_TO_UTF8(*TestTask->SSMLString);
 		const bool OutputResult = TestTask->DoAzureTaskWork_Internal(SSMLString_STD);
-		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), !OutputResult);
+		TestResult = TestResult && TestTrue(TEXT("After the task work, the output result can't be false"), OutputResult);
 	}
 
 	return TestResult;
@@ -121,6 +121,13 @@ bool FSSMLToWavTest::RunTest(const FString& Parameters)
 	// Generated .wav file path
 	const FString FilePath_UE = UAzSpeechHelper::QualifyWAVFileName(TestTask->FilePath, TestTask->FileName);
 	
+	// Check if the .wav file already exists due to previous tests and delete it
+	if (FPaths::FileExists(FilePath_UE))
+	{
+		// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+		IFileManager::Get().Delete(*FilePath_UE, true, true, true);
+	}
+
 	// Check if the output buffer has data
 	{
 		const std::string SSMLString_STD = TCHAR_TO_UTF8(*TestTask->SSMLString);
@@ -144,9 +151,10 @@ bool FSSMLToWavTest::RunTest(const FString& Parameters)
 				TestResult = TestResult && TestTrue(TEXT("After the task work, the output file size can't be 0"), FileSize > 0);
 			}
 
-			// Delete the generated file
+			// Try to delete the generated file
 			{
-				TestResult = TestResult && TestTrue(TEXT("After the task work, we need to delete the generated file"), IFileManager::Get().Delete(*FilePath_UE));
+				// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+				IFileManager::Get().Delete(*FilePath_UE, true, true, true);
 			}
 		}
 	}

@@ -9,8 +9,9 @@ public class UEAzSpeech_Tests : ModuleRules
 	public UEAzSpeech_Tests(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        CppStandard = CppStandardVersion.Cpp17;
 
-		PublicDependencyModuleNames.AddRange(
+        PublicDependencyModuleNames.AddRange(
 			new[]
 			{
 				"Core",

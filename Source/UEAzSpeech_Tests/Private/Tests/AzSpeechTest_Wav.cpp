@@ -19,7 +19,7 @@
 
 static const FString DefaultLanguage = "en-US";
 static const FString DefaultVoice = "en-US-AriaNeural";
-static const FString TextToConvert = "Hello World";
+static const FString TextToConvert = "Hello world.";
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWavToTextDefaultTest, "AzSpeech.Recognizer.Default.WavToText", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::SmokeFilter)
 bool FWavToTextDefaultTest::RunTest(const FString& Parameters)
@@ -56,6 +56,13 @@ bool FWavToTextDefaultTest::RunTest(const FString& Parameters)
 
 	// Generated .wav file path
 	const FString FilePath_UE = UAzSpeechHelper::QualifyWAVFileName(TestTask->FilePath, TestTask->FileName);
+
+	// Check if the .wav file already exists due to previous tests and delete it
+	if (FPaths::FileExists(FilePath_UE))
+	{
+		// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+		IFileManager::Get().Delete(*FilePath_UE, true, true, true);
+	}
 
 	// Generate the .wav file (using another azspeech task)
 	{
@@ -100,9 +107,10 @@ bool FWavToTextDefaultTest::RunTest(const FString& Parameters)
 
 	if (bFileExists)
 	{
-		// Delete the generated file
+		// Try to delete the generated file
 		{
-			TestResult = TestResult && TestTrue(TEXT("After the task work, we need to delete the generated file"), IFileManager::Get().Delete(*FilePath_UE));
+			// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+			IFileManager::Get().Delete(*FilePath_UE, true, true, true);
 		}
 	}
 
@@ -129,7 +137,7 @@ bool FWavToTextAutoTest::RunTest(const FString& Parameters)
 
 	// Check if cached LanguageId is equal to what we passed
 	{
-		TestResult = TestResult && TestEqual(TEXT("The cached language needs to be equal to what we passed on construction"), TestTask->LanguageID, DefaultLanguage);
+		TestResult = TestResult && TestEqual(TEXT("The cached language needs to be equal to what we passed on construction"), TestTask->LanguageID, "Auto");
 	}
 
 	if (const bool bDirectoryCreated = UAzSpeechHelper::CreateNewDirectory(TestTask->FilePath))
@@ -144,6 +152,13 @@ bool FWavToTextAutoTest::RunTest(const FString& Parameters)
 
 	// Generated .wav file path
 	const FString FilePath_UE = UAzSpeechHelper::QualifyWAVFileName(TestTask->FilePath, TestTask->FileName);
+
+	// Check if the .wav file already exists due to previous tests and delete it
+	if (FPaths::FileExists(FilePath_UE))
+	{
+		// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+		IFileManager::Get().Delete(*FilePath_UE, true, true, true);
+	}
 
 	// Generate the .wav file (using another azspeech task)
 	{
@@ -187,9 +202,10 @@ bool FWavToTextAutoTest::RunTest(const FString& Parameters)
 
 	if (bFileExists)
 	{
-		// Delete the generated file
+		// Try to delete the generated file
 		{
-			TestResult = TestResult && TestTrue(TEXT("After the task work, we need to delete the generated file"), IFileManager::Get().Delete(*FilePath_UE));
+			// This can fail with error code 32: "The process cannot access the file because it is being used by another process."
+			IFileManager::Get().Delete(*FilePath_UE, true, true, true);
 		}
 	}
 
